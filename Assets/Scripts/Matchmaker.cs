@@ -6,21 +6,19 @@ using System;
 
 public enum MatchMakingState
 {
-    BeforeJoinLobby,
+    BeforeJoin,
     JoinedLobby,
     JoinedRoom,
 }
 
 public class Matchmaker : PunBehaviour
 {
-
-
     private static ISubject<MatchMakingState> _stateSubject = null;
     public static IObservable<MatchMakingState> StateObservable
     {
         get
         {
-            if (_stateSubject == null) _stateSubject = new BehaviorSubject<MatchMakingState>(MatchMakingState.BeforeJoinLobby);
+            if (_stateSubject == null) _stateSubject = new BehaviorSubject<MatchMakingState>(MatchMakingState.BeforeJoin);
             return _stateSubject.AsObservable();
         }
     }
@@ -33,15 +31,19 @@ public class Matchmaker : PunBehaviour
     public override void OnJoinedLobby()
     {
         _stateSubject.OnNext(MatchMakingState.JoinedLobby);
-
+        
+        /*
         if (PhotonNetwork.GetRoomList().Length == 0)
         {
-            PhotonNetwork.CreateRoom(null);
+            ChatGUI.MessageToDisplay = "Created a room";
+            PhotonNetwork.CreateRoom("chat room", new RoomOptions() { MaxPlayers = 10 }, TypedLobby.Default);
         }
         else
         {
+            ChatGUI.MessageToDisplay = "Joined a room";
             PhotonNetwork.JoinRandomRoom();
         }
+        */
     }
 
     public override void OnJoinedRoom()

@@ -37,7 +37,7 @@ public class ChatServer : Photon.MonoBehaviour
     {
         switch (_currentState)
         {
-            case MatchMakingState.BeforeJoinLobby:
+            case MatchMakingState.BeforeJoin:
                 {
                     break;
                 }
@@ -69,6 +69,7 @@ public class ChatServer : Photon.MonoBehaviour
     [PunRPC]
     void SendChatMessage(string text, PhotonMessageInfo info)
     {
+        ChatGUI.MessageToDisplay = "Message received";
         AddMessage(text);
     }
 

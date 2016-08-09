@@ -21,7 +21,13 @@ public class ChatGUI : MonoBehaviour
 
         _ChatServer.ChatMessageObservable
                    .Where(x => _chatIsEnabled)
-                   .Subscribe(x => { });
+                   .Subscribe(x => 
+                   {
+                       messages.Add(x);
+                       if (messages.Count > 15)
+                           messages.RemoveAt(0);
+                   })
+                   .AddTo(gameObject);
     }
 
     private Action _onGuiAction = () => { };
@@ -50,12 +56,15 @@ public class ChatGUI : MonoBehaviour
 
     void RenderStates()
     {
-        if (!debug) return;
         GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
     }
 
+    public static string MessageToDisplay = "Result Displayed here";
     void RenderChatInterface()
     {
+        if(debug)
+            GUILayout.Label(MessageToDisplay);
+
         GUILayout.BeginArea(new Rect(0, Screen.height - chatHeight, Screen.width, chatHeight));
 
         //Show scroll list of chat messages
@@ -66,14 +75,17 @@ public class ChatGUI : MonoBehaviour
         {
             GUILayout.Label(messages[i]);
         }
+        GUILayout.EndScrollView();
 
+        GUILayout.BeginHorizontal();
         GUI.SetNextControlName("ChatField");
-        chatInput = GUILayout.TextField(chatInput, GUILayout.MinWidth(200));
+        chatInput = GUILayout.TextField(chatInput, GUILayout.MinWidth(300));
         if (Event.current.type == EventType.keyDown && Event.current.character == '\n')
         {
             if (GUI.GetNameOfFocusedControl() == "ChatField")
             {
                 _ChatServer.SendChat(chatInput);
+                chatInput = "";
                 lastUnfocusTime = Time.time;
                 GUI.FocusControl("");
                 GUI.UnfocusWindow();
@@ -87,7 +99,8 @@ public class ChatGUI : MonoBehaviour
             }
         }
 
-        GUILayout.EndScrollView();
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
 
         GUILayout.EndArea();
     }
